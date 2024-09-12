@@ -1,10 +1,13 @@
-FROM maven:3.8.8-openjdk-17 AS build
-WORKDIR /app
+#
+# Build stage
+#
+FROM maven:3.9-eclipse-temurin-22-alpine AS build
 COPY . .
-RUN mvn clean package
+RUN mvn clean package -DskipTests
 
-FROM openjdk:17-jdk-slim
-WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+#
+# Package stage
+#
+FROM eclipse-temurin:22-jdk-alpine
+COPY --from=build /target/*.jar app.jar
+ENTRYPOINT ["java","-jar","app.jar"]
